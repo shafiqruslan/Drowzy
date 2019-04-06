@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "838853060462",
+    "firebase_url": "https://drowzy-4b37e.firebaseio.com",
+    "project_id": "drowzy-4b37e",
+    "storage_bucket": "drowzy-4b37e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:838853060462:android:42f49dc7a285ef7d",
+        "android_client_info": {
+          "package_name": "com.example.drowzy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "838853060462-89u3mis4m7irhnds4og1gd2lcigmcts9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.drowzy",
+            "certificate_hash": "79a2907e5902b475f17d9038d5b09d75af09dada"
+          }
+        },
+        {
+          "client_id": "838853060462-vetf3fu0lf5euma1cpifbgil03n2jshf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCZkh0fLojE86Xs4isTPH8YEkbzoA3FNQs"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "838853060462-vetf3fu0lf5euma1cpifbgil03n2jshf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
