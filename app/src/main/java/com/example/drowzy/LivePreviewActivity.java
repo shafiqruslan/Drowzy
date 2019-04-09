@@ -13,6 +13,7 @@
 // limitations under the License.
 package com.example.drowzy;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -50,7 +51,8 @@ public final class LivePreviewActivity extends AppCompatActivity
     private CameraSource cameraSource = null;
     private CameraSourcePreview preview;
     private GraphicOverlay graphicOverlay;
-
+    private boolean mCameraPermissionGranted = false;
+    public static final int PERMISSIONS_REQUEST_CAMERA = 9000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,11 +77,13 @@ public final class LivePreviewActivity extends AppCompatActivity
             facingSwitch.setVisibility(View.GONE);
         }
 
-        if (allPermissionsGranted()) {
-            createCameraSource();
-        } else {
-            getRuntimePermissions();
-        }
+//        if (allPermissionsGranted()) {
+//            createCameraSource();
+//        } else {
+//            getRuntimePermissions();
+//        }
+
+        getCameraPermission();
     }
 
     @Override
@@ -101,8 +105,8 @@ public final class LivePreviewActivity extends AppCompatActivity
         if (cameraSource == null) {
             cameraSource = new CameraSource(this, graphicOverlay);
         }
-                Log.i(TAG, "Using Face Detector Processor");
-                cameraSource.setMachineLearningFrameProcessor(new FaceDetectionProcessor(this,this));
+        Log.i(TAG, "Using Face Detector Processor");
+        cameraSource.setMachineLearningFrameProcessor(new FaceDetectionProcessor(this, this));
     }
 
     /**
@@ -135,7 +139,9 @@ public final class LivePreviewActivity extends AppCompatActivity
         startCameraSource();
     }
 
-    /** Stops the camera. */
+    /**
+     * Stops the camera.
+     */
     @Override
     protected void onPause() {
         super.onPause();
@@ -150,62 +156,109 @@ public final class LivePreviewActivity extends AppCompatActivity
         }
     }
 
-    private String[] getRequiredPermissions() {
-        try {
-            PackageInfo info =
-                    this.getPackageManager()
-                            .getPackageInfo(this.getPackageName(), PackageManager.GET_PERMISSIONS);
-            String[] ps = info.requestedPermissions;
-            if (ps != null && ps.length > 0) {
-                return ps;
-            } else {
-                return new String[0];
-            }
-        } catch (Exception e) {
-            return new String[0];
-        }
-    }
 
-    private boolean allPermissionsGranted() {
-        for (String permission : getRequiredPermissions()) {
-            if (!isPermissionGranted(this, permission)) {
-                return false;
-            }
-        }
-        return true;
-    }
 
-    private void getRuntimePermissions() {
-        List<String> allNeededPermissions = new ArrayList<>();
-        for (String permission : getRequiredPermissions()) {
-            if (!isPermissionGranted(this, permission)) {
-                allNeededPermissions.add(permission);
-            }
+//    private String[] getRequiredPermissions() {
+//        try {
+//            PackageInfo info =
+//                    this.getPackageManager()
+//                            .getPackageInfo(this.getPackageName(), PackageManager.GET_PERMISSIONS);
+//            String[] ps = info.requestedPermissions;
+//            if (ps != null && ps.length > 0) {
+//                return ps;
+//            } else {
+//                return new String[0];
+//            }
+//        } catch (Exception e) {
+//            return new String[0];
+//        }
+//    }
+//
+//    private boolean allPermissionsGranted() {
+//        for (String permission : getRequiredPermissions()) {
+//            if (!isPermissionGranted(this, permission)) {
+//                return false;
+//            }
+//        }
+//        return true;
+//    }
+//
+//    private void getRuntimePermissions() {
+//        List<String> allNeededPermissions = new ArrayList<>();
+//        for (String permission : getRequiredPermissions()) {
+//            if (!isPermissionGranted(this, permission)) {
+//                allNeededPermissions.add(permission);
+//            }
+//        }
+//
+//        if (!allNeededPermissions.isEmpty()) {
+//            ActivityCompat.requestPermissions(
+//                    this, allNeededPermissions.toArray(new String[0]), PERMISSION_REQUESTS);
+//        }
+//    }
+//
+//    @Override
+//    public void onRequestPermissionsResult(
+//            int requestCode, String[] permissions, int[] grantResults) {
+//        Log.i(TAG, "Permission granted!");
+//        if (allPermissionsGranted()) {
+//            createCameraSource();
+//        }
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//    }
+//
+//    private static boolean isPermissionGranted(Context context, String permission) {
+//        if (ContextCompat.checkSelfPermission(context, permission)
+//                == PackageManager.PERMISSION_GRANTED) {
+//            Log.i(TAG, "Permission granted: " + permission);
+//            return true;
+//        }
+//        Log.i(TAG, "Permission NOT granted: " + permission);
+//        return false;
+//    }
+
+    private void getCameraPermission() {
+        /*
+         * Request location permission, so that we can get the location of the
+         * device. The result of the permission request is handled by a callback,
+         * onRequestPermissionsResult.
+         */
+        // Here, thisActivity is the current activity
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CAMERA},
+                    PERMISSIONS_REQUEST_CAMERA);
+        } else {
+            // Permission has already been granted
+            createCameraSource();
         }
 
-        if (!allNeededPermissions.isEmpty()) {
-            ActivityCompat.requestPermissions(
-                    this, allNeededPermissions.toArray(new String[0]), PERMISSION_REQUESTS);
-        }
     }
 
     @Override
-    public void onRequestPermissionsResult(
-            int requestCode, String[] permissions, int[] grantResults) {
-        Log.i(TAG, "Permission granted!");
-        if (allPermissionsGranted()) {
-            createCameraSource();
-        }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
+    public void onRequestPermissionsResult(int requestCode,
+                                           String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_CAMERA: {
+                Log.d(TAG, "onRequestPermissionsResult: true");
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+                    createCameraSource();
+                } else {
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    getCameraPermission();
+                }
+            }
 
-    private static boolean isPermissionGranted(Context context, String permission) {
-        if (ContextCompat.checkSelfPermission(context, permission)
-                == PackageManager.PERMISSION_GRANTED) {
-            Log.i(TAG, "Permission granted: " + permission);
-            return true;
+            // other 'case' lines to check for other
+            // permissions this app might request.
         }
-        Log.i(TAG, "Permission NOT granted: " + permission);
-        return false;
     }
 }
