@@ -57,10 +57,7 @@ public class FaceDetectionProcessor extends VisionProcessorBase<List<FirebaseVis
 
     private Context context;
     public LivePreviewActivity livePreviewActivity;
-    Handler mhandler;
-    private static int count = 0;
     private boolean sleep;
-    private boolean alert;
     private long begin = 0;
     private int flag = 0;
     private AlertDialog alertDialog;
