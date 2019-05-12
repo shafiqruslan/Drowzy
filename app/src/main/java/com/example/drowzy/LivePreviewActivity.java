@@ -46,12 +46,10 @@ public final class LivePreviewActivity extends AppCompatActivity
         implements OnRequestPermissionsResultCallback,
         CompoundButton.OnCheckedChangeListener {
     private static final String TAG = "LivePreviewActivity";
-    private static final int PERMISSION_REQUESTS = 1;
 
     private CameraSource cameraSource = null;
     private CameraSourcePreview preview;
     private GraphicOverlay graphicOverlay;
-    private boolean mCameraPermissionGranted = false;
     public static final int PERMISSIONS_REQUEST_CAMERA = 9000;
 
     @Override
@@ -157,7 +155,6 @@ public final class LivePreviewActivity extends AppCompatActivity
     }
 
 
-
 //    private String[] getRequiredPermissions() {
 //        try {
 //            PackageInfo info =
@@ -235,30 +232,29 @@ public final class LivePreviewActivity extends AppCompatActivity
             // Permission has already been granted
             createCameraSource();
         }
-
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String[] permissions, int[] grantResults) {
-        switch (requestCode) {
-            case PERMISSIONS_REQUEST_CAMERA: {
-                Log.d(TAG, "onRequestPermissionsResult: true");
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // permission was granted, yay! Do the
-                    // contacts-related task you need to do.
-                    createCameraSource();
-                } else {
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-                    getCameraPermission();
+        @Override
+        public void onRequestPermissionsResult(int requestCode,
+                                               String[] permissions, int[] grantResults) {
+            switch (requestCode) {
+                case PERMISSIONS_REQUEST_CAMERA: {
+                    Log.d(TAG, "onRequestPermissionsResult: true");
+                    // If request is cancelled, the result arrays are empty.
+                    if (grantResults.length > 0
+                            && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                        // permission was granted, yay! Do the
+                        // contacts-related task you need to do.
+                        createCameraSource();
+                    } else {
+                        // permission denied, boo! Disable the
+                        // functionality that depends on this permission.
+                        getCameraPermission();
+                    }
                 }
-            }
 
-            // other 'case' lines to check for other
-            // permissions this app might request.
-        }
+                // other 'case' lines to check for other
+                // permissions this app might request.
+            }
     }
 }

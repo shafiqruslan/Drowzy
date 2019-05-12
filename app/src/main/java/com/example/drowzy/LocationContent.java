@@ -2,9 +2,9 @@ package com.example.drowzy;
 
     public class LocationContent {
 
-        private String name;
-        private Double latitude;
-        private Double longitude;
+        public String name;
+        public Double latitude;
+        public Double longitude;
 
         public String getName() {
             return name;

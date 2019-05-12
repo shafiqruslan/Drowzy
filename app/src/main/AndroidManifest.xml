@@ -1,21 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:ignore="GoogleAppIndexingWarning"
-    package="com.example.drowzy">
+    package="com.example.drowzy"
+    tools:ignore="GoogleAppIndexingWarning">
 
+    <!--
+         The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
+         Google Maps Android API v2, but you must specify either coarse or fine
+         location permissions for the 'MyLocation' functionality.
+    -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!--<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />-->
 
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
     <uses-feature
         android:glEsVersion="0x00020000"
-        android:required="true"/>
+        android:required="true" />
 
     <application
         android:allowBackup="false"
@@ -34,13 +40,28 @@
              sign the APK for publishing.
              You can define the keys for the debug and release targets in src/debug/ and src/release/.
         -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key" />
 
         <activity
             android:name=".MapsActivity"
-            android:label="@string/title_activity_maps" />
+            android:label="@string/title_activity_maps">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.drowzy.LocationActivity" />
+        </activity>
+        <!--
+             The API key for Google Maps-based APIs is defined as a string resource.
+             (See the file "res/values/google_maps_api.xml").
+             Note that the API key is linked to the encryption key used to sign the APK.
+             You need a different API key for each encryption key, including the release key that is used to
+             sign the APK for publishing.
+             You can define the keys for the debug and release targets in src/debug/ and src/release/.
+        -->
         <activity
             android:name=".LocationActivity"
-            android:theme="@style/LocationTheme"/>
+            android:theme="@style/LocationTheme" />
         <activity
             android:name=".SplashActivity"
             android:theme="@style/SplashTheme">
@@ -53,8 +74,7 @@
         <activity android:name=".MainActivity" />
         <activity
             android:name=".TipsActivity"
-            android:theme="@style/TipsTheme" />
-        <!-- <activity android:name=".CameraPreviewActivity" -->
+            android:theme="@style/TipsTheme" /> <!-- <activity android:name=".CameraPreviewActivity" -->
         <!-- android:label="@string/app_name" -->
         <!-- android:screenOrientation="landscape"> -->
         <!-- </activity> -->
@@ -64,10 +84,6 @@
             android:name=".LivePreviewActivity"
             android:exported="true"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
-
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="google_map_api_key"/>
 
         <meta-data
             android:name="com.google.firebase.ml.vision.DEPENDENCIES"
@@ -82,6 +98,10 @@
         <uses-library
             android:name="org.apache.http.legacy"
             android:required="false" />
+
+        <service
+            android:name=".LocationService"
+            android:stopWithTask="true"></service>
     </application>
 
 </manifest>

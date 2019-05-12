@@ -2,4 +2,5 @@
     <string name="app_name">Drowzy</string>
     <string name="title_activity_maps">Map</string>
     <string name="google_map_api_key">AIzaSyBNqQLhxm-jPLFOP5n6wZJBH4Uj48TPMlg</string>
+    <string name="title_activity_maps_activitytest">Map</string>
 </resources>
