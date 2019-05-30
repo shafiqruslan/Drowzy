@@ -14,14 +14,20 @@
 package com.example.drowzy;
 
 import android.Manifest;
+import android.app.ActivityManager;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityCompat.OnRequestPermissionsResultCallback;
@@ -30,9 +36,25 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.annotation.KeepName;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.ResolvableApiException;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.ml.vision.face.FirebaseVisionFace;
 
 import java.io.IOException;
@@ -51,6 +73,7 @@ public final class LivePreviewActivity extends AppCompatActivity
     private CameraSourcePreview preview;
     private GraphicOverlay graphicOverlay;
     public static final int PERMISSIONS_REQUEST_CAMERA = 9000;
+//    private static final int PERMISSION_REQUESTS = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +99,13 @@ public final class LivePreviewActivity extends AppCompatActivity
         }
 
 //        if (allPermissionsGranted()) {
-//            createCameraSource();
+//            if(isServicesOK()) {
+//                if (isMapsEnabled()) {
+//                    createCameraSource();
+//                    startLocationService();
+//                    Log.d(TAG, "onCreate: Camera Source");
+//                }
+//            }
 //        } else {
 //            getRuntimePermissions();
 //        }
@@ -199,7 +228,11 @@ public final class LivePreviewActivity extends AppCompatActivity
 //            int requestCode, String[] permissions, int[] grantResults) {
 //        Log.i(TAG, "Permission granted!");
 //        if (allPermissionsGranted()) {
-//            createCameraSource();
+//            if(isServicesOK()) {
+//                if (isMapsEnabled()) {
+//                    createCameraSource();
+//                }
+//            }
 //        }
 //        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 //    }
