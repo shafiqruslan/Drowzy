@@ -21,6 +21,7 @@ import android.graphics.Bitmap;
 import android.hardware.Camera;
 import android.media.FaceDetector;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
@@ -160,29 +161,41 @@ public class FaceDetectionProcessor extends VisionProcessorBase<List<FirebaseVis
 //        }
 //   }
 
-    public void eyeTracking(FirebaseVisionFace face){
-        boolean right_eye = face.getRightEyeOpenProbability() < 0.5;
-        boolean left_eye =  face.getLeftEyeOpenProbability() < 0.5;
+    public void eyeTracking(FirebaseVisionFace face) {
+        boolean right_eye = face.getRightEyeOpenProbability() < 0.2;
+        boolean left_eye = face.getLeftEyeOpenProbability() < 0.2;
 
         if (right_eye && left_eye) {
             //if your begin variable is reset
-            if(begin==0){
+            if (begin == 0) {
                 begin = System.currentTimeMillis();
                 sleep = true;
             }
             Log.d(TAG, "eyeTracking: " + sleep);
-        }
-
-        else {
+        } else {
             //reset your begin variable
-            begin=0;
+            begin = 0;
             sleep = false;
         }
+
+//        public static long startTimer(){
+//            if (begin==0) {
+//                long begin = System.currentTimeMillis();
+//                return begin;
+//            }
+//        }
+
+//        public static long pauseTimer(){
+//            long pause = System.currentTimeMillis();
+//            long duration = begin - pause;
+//            return duration;
+//        }
 
         Log.d(TAG, "Eyes closed time: "+ "begin" + begin + "current" + System.currentTimeMillis());
         if(sleep && System.currentTimeMillis()-begin>1500){
             Log.d(TAG, "Show alert");
             alertBox();
+            begin = 0;
             flag=1;
         }
     }
@@ -206,13 +219,16 @@ public class FaceDetectionProcessor extends VisionProcessorBase<List<FirebaseVis
 //            public void run() {
         playMedia();
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setMessage("Drowzy Detected")
+                builder.setMessage("Drowsy Detected. Do you want to navigate to the nearest places?")
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 // FIRE ZE MISSILES!
                                 flag=0;
                                 stopPlaying();
-                                Intent intent = new Intent(livePreviewActivity, LocationActivity.class);
+                                Intent intent = new Intent(livePreviewActivity, LocationList.class);
+//                                Uri gmmIntentUri = Uri.parse("google.navigation:q=Taronga+Zoo,+Sydney+Australia");
+//                                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+//                                mapIntent.setPackage("com.google.android.apps.maps");
                                 livePreviewActivity.startActivity(intent);
                             }
                         })

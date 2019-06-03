@@ -48,7 +48,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class LocationService extends Service {
+public class LocationService2 extends Service {
 
     private static final String TAG = "LocationService";
 
@@ -102,6 +102,7 @@ public class LocationService extends Service {
         mLocationRequestHighAccuracy.setInterval(UPDATE_INTERVAL);
         mLocationRequestHighAccuracy.setFastestInterval(FASTEST_INTERVAL);
 
+
         // new Google API SDK v11 uses getFusedLocationProviderClient(this)
         if (ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -121,23 +122,56 @@ public class LocationService extends Service {
                         if (location != null) {
                             double latitude = location.getLatitude();
                             double longitude = location.getLongitude();
+                            callData(latitude,longitude);
                             Log.d(TAG, "onLocationResult: Count");
                             Log.d(TAG, "onSuccess: Cordinates" + latitude + "," + longitude);
-                            getJson(latitude,longitude);
                         }
                     }
                 },
                 Looper.myLooper()); // Looper.myLooper tells this to repeat forever until thread is destroyed
     }
 
-    private void getJson(double cLatitude, double cLongitude){
+    private void callData(final double cLatitude, final double cLongitude){
+        // Get a reference to our posts
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference ref = database.getReference("Locations/South Bound");
+
+        // Attach a listener to read the data at our posts reference
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
+                    // TODO: handle the post
+
+                    String name = postSnapshot.child("name").getValue().toString();
+                    String data = postSnapshot.child("latitude").getValue().toString();
+                    String data2 = postSnapshot.child("longitude").getValue().toString();
+
+                    double dLatitude = Double.valueOf(data);
+                    double dLongitude = Double.valueOf(data2);
+
+                    Log.d(TAG, "onDataChange: latitude" );
+                    getJson(cLatitude,cLongitude,dLatitude,dLongitude);
+
+                }
+//                Log.d(TAG, "onDataChange: list" + list);;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                System.out.println("The read failed: " + databaseError.getCode());
+            }
+        });
+    }
+
+    private void getJson(double cLatitude, double cLongitude, final double dLatitude, final double dLongitude){
         // Request a string response from the provided URL.
         // final TextView post_name = (TextView) findViewById(R.id.post_name);
         // Instantiate the RequestQueue
         RequestQueue queue = Volley.newRequestQueue(this);
 
-//        String url ="https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins="+cLatitude+","+cLongitude+"&destinations="+dLatitude+","+dLongitude+"&key="+APIKEY+"\n";
-        String url ="https://maps.googleapis.com/maps/api/place/nearbysearch/json?location="+cLatitude+","+cLongitude+"2&radius=1500&type=restaurant&key="+APIKEY+"\n";
+        String url ="https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins="+cLatitude+","+cLongitude+"&destinations="+dLatitude+","+dLongitude+"&key="+APIKEY+"\n";
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
 
@@ -148,17 +182,15 @@ public class LocationService extends Service {
                 // Convert String to json object
                 try {
                     JSONObject json = new JSONObject(response);
-                    JSONArray results_arr = json.getJSONArray("results");
-                    JSONObject geometry_obj = results_arr.getJSONObject(0);
-                    JSONObject location_obj = geometry_obj.getJSONObject("location");
-                    JSONObject lat_obj = location_obj.getJSONObject("lat");
-                    JSONObject long_obj = location_obj.getJSONObject("lng");
+                    JSONArray rows_arr = json.getJSONArray("rows");
+                    JSONObject rows_obj = rows_arr.getJSONObject(0);
+                    JSONArray elements_arr = rows_obj.getJSONArray("elements");
+                    JSONObject elements_obj = elements_arr.getJSONObject(0);
+                    JSONObject distance_obj = elements_obj.getJSONObject("distance");
 
-                    String name = geometry_obj.getString("name");
-                    String lat = lat_obj.getString("lat");
-                    String lng = long_obj.getString("lng");
-//                    String distance_new = distance.substring(0, distance.length() -2);
-                    Log.d(TAG, "onResponse: " + name);
+                    String distance = distance_obj.getString("text");
+                    String distance_new = distance.substring(0, distance.length() -2);
+                    Log.d(TAG, "onResponse: " + distance_new);
 //                            holder.post_distance.setText(String.valueOf(distance_new));
 //                            Log.d(TAG, "onResponse: distance"+ distance);
 //                          Log.d(TAG, "onResponse: distance " + distance);
@@ -178,6 +210,15 @@ public class LocationService extends Service {
         queue.add(stringRequest);
     }
 
+//    public static int getMinValue(int[] numbers){
+//        int minValue = numbers[0];
+//        for(int i=1;i<numbers.length;i++){
+//            if(numbers[i] < minValue){
+//                minValue = numbers[i];
+//            }
+//        }
+//        return minValue;
+//    }
 }
 
 

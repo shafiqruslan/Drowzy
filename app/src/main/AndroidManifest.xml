@@ -59,9 +59,12 @@
              sign the APK for publishing.
              You can define the keys for the debug and release targets in src/debug/ and src/release/.
         -->
+        <!--<activity-->
+            <!--android:name=".LocationActivity"-->
+            <!--android:theme="@style/LocationTheme" />-->
         <activity
-            android:name=".LocationActivity"
-            android:theme="@style/LocationTheme" />
+        android:name=".LocationList"
+        android:theme="@style/LocationTheme" />
         <activity
             android:name=".SplashActivity"
             android:theme="@style/SplashTheme">

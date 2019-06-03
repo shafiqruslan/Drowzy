@@ -5,6 +5,7 @@ package com.example.drowzy;
         public String name;
         public Double latitude;
         public Double longitude;
+        public Double distance;
 
         public String getName() {
             return name;
@@ -30,10 +31,19 @@ package com.example.drowzy;
             this.longitude = longitude;
         }
 
-        public LocationContent(String name, double latitude, double longitude) {
+        public double getDistance() {
+            return distance;
+        }
+
+        public void setDistance(double distance) {
+            this.distance = distance;
+        }
+
+        public LocationContent(String name, double latitude, double longitude,double distance) {
             this.name = name;
             this.latitude = latitude;
             this.longitude = longitude;
+            this.distance = distance;
         }
 
         public LocationContent(){

@@ -1,14 +1,12 @@
-package com.example.drowzy;
-
-import java.util.*;
-
-public class DistanceComparator implements Comparator<LocationData> {
-    public int compare(LocationData L1,LocationData L2){
-        if(L1.distance==L2.distance)
-            return 0;
-        else if(L1.distance>L2.distance)
-            return 1;
-        else
-            return -1;
-    }
-}
+//package com.example.drowzy;
+//
+//import java.util.*;
+//
+//public class DistanceComparator implements Comparator<LocationContent> {
+//    public int compare(LocationContent L1,LocationContent L2){
+//        double delta= L1.getDistance() - L2.getDistance();
+//        if(delta > 0.00001) return 1;
+//        if(delta < -0.00001) return -1;
+//        return 0;
+//    }
+//}
