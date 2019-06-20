@@ -9,4 +9,6 @@
     <color name="colorDrowzy">#4F90AC</color>
     <color name="colorBlack">#000000</color>
     <color name="colorDrowzyDua">#564FAC</color>
+    <color name="grey_300">#E0E0E0</color>
+    <color name="grey_500">#9E9E9E</color>
 </resources>

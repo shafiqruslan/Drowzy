@@ -15,7 +15,7 @@
       },
       "oauth_client": [
         {
-          "client_id": "838853060462-89u3mis4m7irhnds4og1gd2lcigmcts9.apps.googleusercontent.com",
+          "client_id": "838853060462-mmgn70jbru2iteomnnik9ojtfksuban8.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.drowzy",
@@ -33,20 +33,13 @@
         }
       ],
       "services": {
-        "analytics_service": {
-          "status": 1
-        },
         "appinvite_service": {
-          "status": 2,
           "other_platform_oauth_client": [
             {
               "client_id": "838853060462-vetf3fu0lf5euma1cpifbgil03n2jshf.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
-        },
-        "ads_service": {
-          "status": 2
         }
       }
     }

@@ -17,6 +17,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class NetworkManager {
@@ -50,7 +51,7 @@ public class NetworkManager {
         Log.d(TAG, "lat: " + location.getLatitude() + ", long: " + location.getLongitude());
         String url = PLACES_BASE_URL  +
                 "type=gas_station" +
-                "&location=" +location.getLatitude()+ ","+ location.getLongitude()+
+                "&location=" +latitude+ ","+ longitude+
                 "&radius=" + radius +
                 "&key=" + API_KEY;
         makeRequest(url,location);
@@ -89,6 +90,8 @@ public class NetworkManager {
                                             googlePlace.getJSONObject("geometry").getJSONObject("location").getDouble("lat"),
                                             googlePlace.getJSONObject("geometry").getJSONObject("location").getDouble("lng"),Double.valueOf(distance_new)));
                                 }
+                                //sort the distance
+                                Collections.sort(list,new DistanceComparator());
                             }
                             refreshPlaces(list);
                         } catch (JSONException e) {

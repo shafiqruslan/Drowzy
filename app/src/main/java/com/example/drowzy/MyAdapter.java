@@ -39,12 +39,12 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     public void onBindViewHolder(MyViewHolder holder, int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
+
         holder.bind(mList.get(position),mClickListener);
         holder.post_name.setText(mList.get(position).getName());
         holder.post_latitude.setText(Double.toString(mList.get(position).getLatitude()));
         holder.post_longitude.setText(Double.toString(mList.get(position).getLongitude()));
         holder.post_distance.setText(mList.get(position).getDistance()+" Km");
-
 
     }
 

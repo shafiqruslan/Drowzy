@@ -31,9 +31,16 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.vision.face.Face;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.face.FirebaseVisionFace;
@@ -64,6 +71,12 @@ public class FaceDetectionProcessor extends VisionProcessorBase<List<FirebaseVis
     private AlertDialog alertDialog;
     private MediaPlayer mediaPlayer;
 
+    //Database
+    // [START declare_database_ref]
+    private DatabaseReference mDatabase;
+    // [END declare_database_ref]
+
+
     public FaceDetectionProcessor(Context context, LivePreviewActivity livePreviewActivity) {
         this.context = context;
         this.livePreviewActivity = livePreviewActivity;
@@ -77,6 +90,14 @@ public class FaceDetectionProcessor extends VisionProcessorBase<List<FirebaseVis
 
         detector = FirebaseVision.getInstance().getVisionFaceDetector(options);
 
+        // [START initialize_database_ref]
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        // [END initialize_database_ref]
+
+    }
+
+    public String getUid() {
+        return FirebaseAuth.getInstance().getCurrentUser().getUid();
     }
 
     @Override
@@ -192,13 +213,53 @@ public class FaceDetectionProcessor extends VisionProcessorBase<List<FirebaseVis
 //        }
 
         Log.d(TAG, "Eyes closed time: "+ "begin" + begin + "current" + System.currentTimeMillis());
-        if(sleep && System.currentTimeMillis()-begin>1500){
+        if(sleep && System.currentTimeMillis()-begin>500){
             Log.d(TAG, "Show alert");
             alertBox();
+
             begin = 0;
             flag=1;
         }
     }
+
+//    private void saveData(){
+//        // [START single_value_read]
+//        final String userId = getUid();
+//        mDatabase.child("users").child(userId).addListenerForSingleValueEvent(
+//                new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(DataSnapshot dataSnapshot) {
+//                        // Get user value
+//                        User user = dataSnapshot.getValue(User.class);
+//
+//                        // [START_EXCLUDE]
+//                        if (user == null) {
+//                            // User is null, error out
+//                            Log.e(TAG, "User " + userId + " is unexpectedly null");
+//                            Toast.makeText(NewPostActivity.this,
+//                                    "Error: could not fetch user.",
+//                                    Toast.LENGTH_SHORT).show();
+//                        } else {
+//                            // Write new post
+//                            writeNewPost(userId, user.username, title, body);
+//                        }
+//
+//                        // Finish this Activity, back to the stream
+//                        setEditingEnabled(true);
+//                        finish();
+//                        // [END_EXCLUDE]
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(DatabaseError databaseError) {
+//                        Log.w(TAG, "getUser:onCancelled", databaseError.toException());
+//                        // [START_EXCLUDE]
+//                        setEditingEnabled(true);
+//                        // [END_EXCLUDE]
+//                    }
+//                });
+//        // [END single_value_read]
+//    }
 
     private void playMedia(){
         stopPlaying();

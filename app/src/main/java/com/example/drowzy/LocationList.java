@@ -28,8 +28,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.ApiException;
@@ -239,7 +237,6 @@ public class LocationList extends AppCompatActivity {
                     getListPlace();
                     // All location settings are satisfied. The client can initialize location
                     // requests here.
-
 
                 } catch (ApiException exception) {
                     switch (exception.getStatusCode()) {
