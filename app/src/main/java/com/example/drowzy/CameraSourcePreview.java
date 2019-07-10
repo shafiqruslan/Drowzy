@@ -34,7 +34,7 @@ public class CameraSourcePreview extends ViewGroup {
     private SurfaceView surfaceView;
     private boolean startRequested;
     private boolean surfaceAvailable;
-    private com.example.drowzy.CameraSource cameraSource;
+    private CameraSource cameraSource;
 
     private GraphicOverlay overlay;
 
@@ -49,7 +49,7 @@ public class CameraSourcePreview extends ViewGroup {
         addView(surfaceView);
     }
 
-    public void start(com.example.drowzy.CameraSource cameraSource) throws IOException {
+    public void start(CameraSource cameraSource) throws IOException {
         if (cameraSource == null) {
             stop();
         }
@@ -62,7 +62,7 @@ public class CameraSourcePreview extends ViewGroup {
         }
     }
 
-    public void start(com.example.drowzy.CameraSource cameraSource, GraphicOverlay overlay) throws IOException {
+    public void start(CameraSource cameraSource, GraphicOverlay overlay) throws IOException {
         this.overlay = overlay;
         start(cameraSource);
     }
@@ -147,15 +147,14 @@ public class CameraSourcePreview extends ViewGroup {
         int childWidth = layoutWidth;
         int childHeight = (int) (((float) layoutWidth / (float) width) * height);
 
-//         If height is too tall using fit width, does fit height instead.
-//        if (childHeight > layoutHeight) {
-//            childHeight = layoutHeight;
-//            childWidth = (int) (((float) layoutHeight / (float) height) * width);
-//        }
+        // If height is too tall using fit width, does fit height instead.
+        if (childHeight > layoutHeight) {
+            childHeight = layoutHeight;
+            childWidth = (int) (((float) layoutHeight / (float) height) * width);
+        }
 
         for (int i = 0; i < getChildCount(); ++i) {
             getChildAt(i).layout(0, 0, childWidth, childHeight);
-//            getChildAt(i).layout(0, 0, childWidth, layoutHeight);
             Log.d(TAG, "Assigned view: " + i);
         }
 

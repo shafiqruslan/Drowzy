@@ -8,8 +8,10 @@
 
     <string name="firebase_status_fmt">Firebase User: %s</string>
 
-    <string name="signed_out">Signed Out</string>
+    <string name="signed_out">You are signed out. Please Sign in</string>
     <string name="sign_out">Sign Out</string>
     <string name="disconnect">Disconnect</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
 
 </resources>

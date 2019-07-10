@@ -3,9 +3,9 @@ package com.example.drowzy;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -206,6 +206,9 @@ public class SplashActivity extends AppCompatActivity implements
             }
         } else if (i == R.id.disconnectButton) {
             revokeAccess();
+            if(handler!= null && mRunnable != null){
+                handler.removeCallbacks(mRunnable);
+            }
         }
     }
 

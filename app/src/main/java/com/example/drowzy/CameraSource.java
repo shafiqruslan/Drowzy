@@ -22,8 +22,8 @@ import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresPermission;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresPermission;
 import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
@@ -83,7 +83,7 @@ public class CameraSource {
 
     // These values may be requested by the caller.  Due to hardware limitations, we may need to
     // select close, but not exactly the same values for these.
-    private final float requestedFps = 30.0f;
+    private final float requestedFps = 20.0f;
     private final int requestedPreviewWidth = 480;
     private final int requestedPreviewHeight = 360;
     private final boolean requestedAutoFocus = true;

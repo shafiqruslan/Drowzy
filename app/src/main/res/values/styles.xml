@@ -39,9 +39,23 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="LivePreviewTheme" parent="Theme.AppCompat.NoActionBar" >
+    <style name="LivePreviewTheme" parent="Theme.AppCompat.Light.NoActionBar" >
     <!-- Customize your theme here. -->
-
+        <item name="alertDialogTheme">@style/AlertDialogTheme</item>
     </style>
+
+    <style name="AlertDialogTheme" parent="ThemeOverlay.AppCompat.Dialog.Alert">
+        <item name="buttonBarNegativeButtonStyle">@style/NegativeButtonStyle</item>
+        <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
+    </style>
+
+    <style name="NegativeButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@color/colorDanger</item>
+    </style>
+
+    <style name="PositiveButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@color/colorDanger</item>
+    </style>
+
 
 </resources>

@@ -11,4 +11,7 @@
     <color name="colorDrowzyDua">#564FAC</color>
     <color name="grey_300">#E0E0E0</color>
     <color name="grey_500">#9E9E9E</color>
+    <color name="colorDanger">#bb2124</color>
+    <color name="colorWarning">#f0ad4e</color>
+    <color name="colorSuccess">#22bb33</color>
 </resources>
