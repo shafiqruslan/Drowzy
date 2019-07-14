@@ -67,6 +67,11 @@
         <activity
         android:name=".LocationList"
         android:theme="@style/LocationTheme" />
+
+        <activity
+            android:name=".HistoryList"
+            android:theme="@style/HistoryTheme" />
+
         <activity
             android:name=".SplashActivity"
             android:theme="@style/SplashTheme">
