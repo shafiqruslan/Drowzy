@@ -20,6 +20,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
+import android.media.FaceDetector;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
@@ -30,6 +31,7 @@ import androidx.core.app.ActivityCompat.OnRequestPermissionsResultCallback;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.os.CountDownTimer;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
@@ -39,6 +41,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
@@ -48,16 +51,23 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.time.Clock;
+import java.time.Duration;
 import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
-import java.time.LocalDateTime; // Import the LocalDateTime class
-import java.time.format.DateTimeFormatter; // Import the DateTimeFormatter class
+import java.time.LocalDate; // Import the LocalDateTime class
+import java.time.LocalTime; // Import the DateTimeFormatter class
+import java.util.Timer;
+import java.util.TimerTask;
 
 /** Demo app showing the various features of ML Kit for Firebase. This class is used to
  * set up continuous frame processing on frames from a camera source. */
@@ -72,12 +82,24 @@ public final class LivePreviewActivity extends AppCompatActivity
     private GraphicOverlay graphicOverlay;
     public static final int PERMISSIONS_REQUEST_CAMERA = 9000;
     private AlertDialog alertDialog;
+    private AlertDialog alertDialog2;
     private MediaPlayer mediaPlayer;
+    private MediaPlayer mediaPlayer2;
 //    private static final int PERMISSION_REQUESTS = 1;
 
     // [START declare_database_ref]
     private DatabaseReference mDatabase;
     // [END declare_database_ref]
+
+    //Timer
+    private static final long START_TIME_IN_MILLIS = 60000;
+    private TextView mTextViewCountDown;
+
+    private CountDownTimer mCountDownTimer;
+
+//    private boolean mTimerRunning;
+
+    private long mTimeLeftInMillis = START_TIME_IN_MILLIS;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,7 +107,6 @@ public final class LivePreviewActivity extends AppCompatActivity
         Log.d(TAG, "onCreate");
 
         setContentView(R.layout.activity_live_preview);
-
         // [START initialize_database_ref]
         mDatabase = FirebaseDatabase.getInstance().getReference();
         // [END initialize_database_ref]
@@ -105,6 +126,17 @@ public final class LivePreviewActivity extends AppCompatActivity
                 closeCustomDialog();
             }
         });
+
+        Button buttonHistory = (Button) findViewById(R.id.button_history);
+        buttonHistory.setOnClickListener(new View.OnClickListener() {
+
+            public void onClick(View v) {
+                Intent intent = new Intent(LivePreviewActivity.this, HistoryList.class);
+
+                startActivity(intent);
+                finish();
+            }
+        });
         ToggleButton facingSwitch = (ToggleButton) findViewById(R.id.facingSwitch);
         facingSwitch.setOnCheckedChangeListener(this);
         // Hide the toggle button if there is only 1 camera
@@ -112,19 +144,11 @@ public final class LivePreviewActivity extends AppCompatActivity
             facingSwitch.setVisibility(View.GONE);
         }
 
-//        if (allPermissionsGranted()) {
-//            if(isServicesOK()) {
-//                if (isMapsEnabled()) {
-//                    createCameraSource();
-//                    startLocationService();
-//                    Log.d(TAG, "onCreate: Camera Source");
-//                }
-//            }
-//        } else {
-//            getRuntimePermissions();
-//        }
-
         getCameraPermission();
+
+        mTextViewCountDown = findViewById(R.id.text_view_countdown);
+
+//        updateCountDownText();
     }
 
     @Override
@@ -311,15 +335,15 @@ public final class LivePreviewActivity extends AppCompatActivity
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void submitPost() {
-//        final Clock clock = Clock.systemUTC();
-//        System.out.println("UTC time :: " + clock.instant());
 
-        LocalDateTime myDateObj = LocalDateTime.now();
-        System.out.println("Before formatting: " + myDateObj);
-        DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+        final LocalDate date = LocalDate.now();
+        DateTimeFormatter myFormatDate = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        final String formattedDate = date.format(myFormatDate);
+        System.out.println("datez" +formattedDate);
 
-        final String formattedDate = myDateObj.format(myFormatObj);
-        System.out.println("After formatting: " + formattedDate);
+        final LocalTime time = LocalTime.now();
+        DateTimeFormatter myFormatTime = DateTimeFormatter.ofPattern("HH:mm:ss");
+        final String formattedTime = time.format(myFormatTime);
 
         Toast.makeText(this, "Saving...", Toast.LENGTH_SHORT).show();
 
@@ -341,7 +365,7 @@ public final class LivePreviewActivity extends AppCompatActivity
                                     Toast.LENGTH_SHORT).show();
                         } else {
                             // Write new post
-                            writeNewPost(userId, user.username, formattedDate);
+                            writeNewPost(userId, user.username, formattedTime,formattedDate);
                         }
 
                         // Finish this Activity, back to the stream
@@ -359,21 +383,69 @@ public final class LivePreviewActivity extends AppCompatActivity
     }
 
     // [START write_fan_out]
-    private void writeNewPost(String userId, String username, String clock) {
+    private void writeNewPost(String userId, String username, String time, String date) {
         // Create new post at /user-posts/$userid/$postid and at
         // /posts/$postid simultaneously
         String key = mDatabase.child("sleeps").push().getKey();
-        SleepContent sleep = new SleepContent(userId, username, clock.toString());
+        SleepContent sleep = new SleepContent(userId, username,time,date);
 
         Map<String, Object> sleepValues = sleep.toMap();
 
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put("/sleeps/" + key, sleepValues);
         childUpdates.put("/user-sleeps/" + userId + "/" + key, sleepValues);
+        childUpdates.put("/user-date-sleeps/" + userId + "/" + date + "/" + key , sleepValues);
+
 
         mDatabase.updateChildren(childUpdates);
     }
-    // [END write_fan_out]
+
+//    @RequiresApi(api = Build.VERSION_CODES.O)
+//    public void determineDrowsy(){
+//
+//        //get user id
+//        String userId = getUid();
+//
+//        //get date
+//        LocalDate date = LocalDate.now();
+//        DateTimeFormatter myFormatDate = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+//        String formattedDate = date.format(myFormatDate);
+//
+//        //get time
+//        LocalTime time = LocalTime.now();
+//        LocalTime minus_30 = time.minus(Duration.ofSeconds(30));
+//        DateTimeFormatter myFormatTime = DateTimeFormatter.ofPattern("HH:mm:ss");
+//        final String formattedTime = time.format(myFormatTime);
+//        final String minusformattedTime = minus_30.format(myFormatTime);
+//
+//        Query query = mDatabase.child("user-date-sleeps").child(userId).child(formattedDate).orderByChild("time").startAt(minusformattedTime).endAt(formattedTime);
+//        query.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                int count=0;
+//                if (dataSnapshot.exists()) {
+//                    // dataSnapshot is the "issue" node with all children with id 0
+//                    for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+//                        // do something with the individual "issues"
+////                     String time = postSnapshot.child("time").getValue().toString();
+//                     count++;
+//                    }
+//                }
+//                if(count > 5){
+//                    showErrorDialog();
+//                }
+//                else{
+//                    count=0;
+//                }
+//                Log.d(TAG, "onDataChange: count" + count);
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        });
+//    }
 
     public void closeCustomDialog() {
 
@@ -414,7 +486,8 @@ public final class LivePreviewActivity extends AppCompatActivity
     }
 
     public void showErrorDialog() {
-
+        FaceDetectionProcessor.flag = 1;
+        resetTimer();
         //before inflating the custom alert dialog layout, we will get the current activity viewgroup
         ViewGroup viewGroup = findViewById(android.R.id.content);
 
@@ -445,14 +518,15 @@ public final class LivePreviewActivity extends AppCompatActivity
                                 // User cancelled the dialog
                                 stopPlaying();
                                 FaceDetectionProcessor.flag=0;
+                                startTimer();
                             }
                         });
 
         //finally creating the alert dialog and displaying it
-        AlertDialog alertDialog = builder.create();
-        alertDialog.show();
-        Button btnPositive = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
-        Button btnNegative = alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+        alertDialog2 = builder.create();
+        alertDialog2.show();
+        Button btnPositive = alertDialog2.getButton(AlertDialog.BUTTON_POSITIVE);
+        Button btnNegative = alertDialog2.getButton(AlertDialog.BUTTON_NEGATIVE);
 
         LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) btnPositive.getLayoutParams();
         layoutParams.weight = 10;
@@ -460,30 +534,33 @@ public final class LivePreviewActivity extends AppCompatActivity
         btnNegative.setLayoutParams(layoutParams);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     public void showWarningDialog() {
+        if(alertDialog==null){
+            //before inflating the custom alert dialog layout, we will get the current activity viewgroup
+            ViewGroup viewGroup = findViewById(android.R.id.content);
 
-        //before inflating the custom alert dialog layout, we will get the current activity viewgroup
-        ViewGroup viewGroup = findViewById(android.R.id.content);
+            //then we will inflate the custom alert dialog xml that we created
+            View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_warning, viewGroup, false);
 
-        //then we will inflate the custom alert dialog xml that we created
-        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_warning, viewGroup, false);
+            //Now we need an AlertDialog.Builder object
+            AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogTheme);
+            playAlert();
+            //setting the view of the builder to our custom view that we already inflated
+            builder.setView(dialogView);
 
-        //Now we need an AlertDialog.Builder object
-        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogTheme);
-        playMedia();
-        FaceDetectionProcessor.flag=1;
-        //setting the view of the builder to our custom view that we already inflated
-        builder.setView(dialogView);
-
-        //finally creating the alert dialog and displaying it
-        alertDialog = builder.create();
-        alertDialog.show();
+            //finally creating the alert dialog and displaying it
+            alertDialog = builder.create();
+            alertDialog.show();
+        }
+        FaceDetectionProcessor.flag2=1;
     }
 
     public void cancelDialog(){
         if(alertDialog!=null) {
             alertDialog.dismiss();
-            FaceDetectionProcessor.flag = 0;
+            alertDialog=null;
+            FaceDetectionProcessor.flag2 = 0;
         }
     }
 
@@ -493,16 +570,100 @@ public final class LivePreviewActivity extends AppCompatActivity
         mediaPlayer.start(); // no need to call prepare(); create() does that for you
     }
 
+    private void playAlert(){
+        stopAlert();
+        mediaPlayer2 = MediaPlayer.create(this, R.raw.alert);
+        mediaPlayer2.start(); // no need to call prepare(); create() does that for you
+    }
+
     public void stopPlaying(){
         if(mediaPlayer!=null) {
             mediaPlayer.stop();
+            mediaPlayer.release();
             mediaPlayer.release();
             mediaPlayer = null;
         }
     }
 
+    public void stopAlert(){
+        if(mediaPlayer2!=null) {
+            mediaPlayer2.stop();
+            mediaPlayer2.release();
+            mediaPlayer2 = null;
+        }
+    }
+
+//    @RequiresApi(api = Build.VERSION_CODES.O)
+//    public void checkDrowsy(){
+//        if(System.currentTimeMillis()-FaceDetectionProcessor.begin2>30000) {
+//            determineDrowsy();
+//            FaceDetectionProcessor.begin2=0;
+//        }
+//
+//    }
 
 
 
+//Timer
+
+    public void startTimer() {
+        mCountDownTimer = new CountDownTimer(mTimeLeftInMillis, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                mTimeLeftInMillis = millisUntilFinished;
+                updateCountDownText();
+            }
+
+            @Override
+            public void onFinish() {
+//                mTimerRunning = false;
+                determineDrowsy();
+                resetTimer();
+                startTimer();
+                FaceDetectionProcessor.count=0;
+            }
+        }.start();
+
+//        mTimerRunning = true;
+    }
+
+//    private void pauseTimer() {
+//        mCountDownTimer.cancel();
+//        mTimerRunning = false;
+//    }
+
+    private void resetTimer() {
+        mCountDownTimer.cancel();
+//        mTimerRunning = false;
+        mTimeLeftInMillis = START_TIME_IN_MILLIS;
+        updateCountDownText();
+    }
+
+    private void updateCountDownText() {
+        int minutes = (int) (mTimeLeftInMillis / 1000) / 60;
+        int seconds = (int) (mTimeLeftInMillis / 1000) % 60;
+
+        String timeLeftFormatted = String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds);
+
+        mTextViewCountDown.setText(timeLeftFormatted);
+    }
+
+    public void submit(){
+        runOnUiThread(new Runnable() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void run() {
+                submitPost();
+            }
+        });
+    }
+
+    public void determineDrowsy(){
+        if(FaceDetectionProcessor.count>48){
+            showErrorDialog();
+            cancelDialog();
+            submit();
+        }
+    }
 
 }
