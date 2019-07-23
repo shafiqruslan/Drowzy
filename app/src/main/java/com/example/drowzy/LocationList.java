@@ -74,6 +74,16 @@ public class LocationList extends AppCompatActivity {
 
             }
         }
+
+        Button buttonBack = (Button) findViewById(R.id.button_back);
+        buttonBack.setOnClickListener(new View.OnClickListener() {
+
+            public void onClick(View v) {
+                onBackPressed();
+                finish();
+            }
+        });
+
         Button buttonClose = (Button) findViewById(R.id.button_close);
         buttonClose.setOnClickListener(new View.OnClickListener() {
 
@@ -99,7 +109,7 @@ public class LocationList extends AppCompatActivity {
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         // FIRE ZE MISSILES!
-
+                        finishAffinity();
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -357,5 +367,11 @@ public class LocationList extends AppCompatActivity {
 //        Log.d(TAG, "isLocationServiceRunning: location service is not running.");
 //        return false;
 //    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
 }
 

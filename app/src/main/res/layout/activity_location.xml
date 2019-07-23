@@ -15,18 +15,36 @@
         android:background="@drawable/action_bar"
         android:elevation="4dp"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:contentInsetStart ="0dp">
 
         <RelativeLayout
             android:id="@+id/relativeLayout1"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content">
             <Button
+                android:id="@+id/button_back"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="@drawable/ic_arrow_back"
+                android:layout_alignParentStart = "true"/>
+            <Button
                 android:id="@+id/button_close"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:background="@drawable/ic_close"
-                android:layout_alignParentRight = "true"/>
+                android:layout_alignParentEnd = "true"/>
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:fontFamily="@font/open_sans"
+                android:text="Gas Station"
+                android:textColor="#FFFFFF"
+                android:textSize="30sp"
+                android:layout_centerVertical="true"/>
         </RelativeLayout>
     </androidx.appcompat.widget.Toolbar>
 

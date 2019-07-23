@@ -92,7 +92,7 @@ public final class LivePreviewActivity extends AppCompatActivity
     // [END declare_database_ref]
 
     //Timer
-    private static final long START_TIME_IN_MILLIS = 60000;
+    private static final long START_TIME_IN_MILLIS = 30000;
     private TextView mTextViewCountDown;
 
     private CountDownTimer mCountDownTimer;
@@ -107,6 +107,10 @@ public final class LivePreviewActivity extends AppCompatActivity
         Log.d(TAG, "onCreate");
 
         setContentView(R.layout.activity_live_preview);
+
+        //signout button
+        findViewById(R.id.button_close);
+
         // [START initialize_database_ref]
         mDatabase = FirebaseDatabase.getInstance().getReference();
         // [END initialize_database_ref]
@@ -134,9 +138,9 @@ public final class LivePreviewActivity extends AppCompatActivity
                 Intent intent = new Intent(LivePreviewActivity.this, HistoryList.class);
 
                 startActivity(intent);
-                finish();
             }
         });
+
         ToggleButton facingSwitch = (ToggleButton) findViewById(R.id.facingSwitch);
         facingSwitch.setOnCheckedChangeListener(this);
         // Hide the toggle button if there is only 1 camera
@@ -156,9 +160,9 @@ public final class LivePreviewActivity extends AppCompatActivity
         Log.d(TAG, "Set facing");
         if (cameraSource != null) {
             if (isChecked) {
-                cameraSource.setFacing(CameraSource.CAMERA_FACING_FRONT);
-            } else {
                 cameraSource.setFacing(CameraSource.CAMERA_FACING_BACK);
+            } else {
+                cameraSource.setFacing(CameraSource.CAMERA_FACING_FRONT);
             }
         }
         preview.stop();
@@ -463,7 +467,7 @@ public final class LivePreviewActivity extends AppCompatActivity
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         // FIRE ZE MISSILES!
-
+                        finish();
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -510,7 +514,7 @@ public final class LivePreviewActivity extends AppCompatActivity
 //                                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
 //                                mapIntent.setPackage("com.google.android.apps.maps");
                                 startActivity(intent);
-                                finish();
+//                                finish();
                             }
                         })
                         .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -560,6 +564,7 @@ public final class LivePreviewActivity extends AppCompatActivity
         if(alertDialog!=null) {
             alertDialog.dismiss();
             alertDialog=null;
+            stopAlert();
             FaceDetectionProcessor.flag2 = 0;
         }
     }
@@ -659,7 +664,7 @@ public final class LivePreviewActivity extends AppCompatActivity
     }
 
     public void determineDrowsy(){
-        if(FaceDetectionProcessor.count>48){
+        if(FaceDetectionProcessor.count>24){
             showErrorDialog();
             cancelDialog();
             submit();
